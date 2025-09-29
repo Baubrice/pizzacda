@@ -56,8 +56,8 @@ Les paramètres de connexion à la base de données sont configurés dans `src/m
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/cdapizza
-spring.datasource.username=cdapizza_user
-spring.datasource.password=cdapizza_password
+spring.datasource.username=cdapizza
+spring.datasource.password=cdapizzaafpa
 ```
 
 ### 3. Lancement de l'Application
