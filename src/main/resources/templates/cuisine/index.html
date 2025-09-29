@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, ~{::scripts})}">
+<head>
+    <title>CDAPizza - Interface Cuisine</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-utensils"></i> Interface Cuisine
+                </h1>
+            </div>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h4 th:text="${#lists.size(commandesPreparation)}">0</h4>
+                        <p class="mb-0">En Préparation</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h4 th:text="${#lists.size(commandesPrete)}">0</h4>
+                        <p class="mb-0">Prêtes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-list fa-2x mb-2"></i>
+                        <h4 th:text="${#lists.size(commandesEnCours)}">0</h4>
+                        <p class="mb-0">Total En Cours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes en préparation -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i> Commandes en Préparation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(commandesPreparation)}" class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-3x mb-3"></i>
+                            <p>Aucune commande en préparation</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(commandesPreparation)}" class="row">
+                            <div th:each="commande : ${commandesPreparation}" class="col-md-6 col-lg-4 mb-3">
+                                <div class="card commande-card h-100 border-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">Commande #<span th:text="${commande.id}"></span></h6>
+                                            <span class="badge bg-warning text-dark">En Préparation</span>
+                                        </div>
+                                        
+                                        <p class="card-text">
+                                            <strong>Client:</strong> <span th:text="${commande.nomClient}"></span><br>
+                                            <strong>Heure:</strong> <span th:text="${#temporals.format(commande.dateCommande, 'HH:mm')}"></span><br>
+                                            <strong>Montant:</strong> <span th:text="${#numbers.formatDecimal(commande.montant, 1, 2)}"></span> €
+                                        </p>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <a th:href="@{/cuisine/commande/{id}(id=${commande.id})}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Détails
+                                            </a>
+                                            
+                                            <form th:action="@{/cuisine/{id}/changer-etat(id=${commande.id})}" 
+                                                  method="post" class="d-inline">
+                                                <input type="hidden" name="nouvelEtat" value="PRETE">
+                                                <button type="submit" class="btn btn-success btn-sm btn-etat">
+                                                    <i class="fas fa-check"></i> Marquer Prête
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes prêtes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-check-circle"></i> Commandes Prêtes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(commandesPrete)}" class="text-center text-muted py-4">
+                            <i class="fas fa-hourglass-half fa-3x mb-3"></i>
+                            <p>Aucune commande prête</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(commandesPrete)}" class="row">
+                            <div th:each="commande : ${commandesPrete}" class="col-md-6 col-lg-4 mb-3">
+                                <div class="card commande-card h-100 border-info">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">Commande #<span th:text="${commande.id}"></span></h6>
+                                            <span class="badge bg-info">Prête</span>
+                                        </div>
+                                        
+                                        <p class="card-text">
+                                            <strong>Client:</strong> <span th:text="${commande.nomClient}"></span><br>
+                                            <strong>Heure:</strong> <span th:text="${#temporals.format(commande.dateCommande, 'HH:mm')}"></span><br>
+                                            <strong>Montant:</strong> <span th:text="${#numbers.formatDecimal(commande.montant, 1, 2)}"></span> €
+                                        </p>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <a th:href="@{/cuisine/commande/{id}(id=${commande.id})}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Détails
+                                            </a>
+                                            
+                                            <div class="alert alert-info alert-sm mb-0 p-2">
+                                                <i class="fas fa-info-circle"></i>
+                                                <small>En attente de livraison</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="scripts">
+        <script>
+            // Auto-refresh toutes les 5 secondes pour les mises à jour en temps réel
+            setTimeout(function() {
+                location.reload();
+            }, 5000);
+            
+            // Notification sonore pour les nouvelles commandes (optionnel)
+            function playNotificationSound() {
+                // Vous pouvez ajouter un son de notification ici
+                console.log('Nouvelle commande détectée');
+            }
+        </script>
+    </div>
+</body>
+</html>

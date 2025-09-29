@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, ~{::scripts})}">
+<head>
+    <title>CDAPizza - Interface Caisse</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-cash-register"></i> Interface Caisse
+                </h1>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Actions Rapides</h5>
+                        <a href="/caisse/nouvelle-commande" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Nouvelle Commande
+                        </a>
+                        <button class="btn btn-secondary btn-lg ms-2" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i> Actualiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des commandes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Commandes Récentes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(commandes)}" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>Aucune commande pour le moment</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(commandes)}" class="row">
+                            <div th:each="commande : ${commandes}" class="col-md-6 col-lg-4 mb-3">
+                                <div class="card commande-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">Commande #<span th:text="${commande.id}"></span></h6>
+                                            <span class="badge badge-etat" 
+                                                  th:classappend="${commande.etat.name() == 'PAYER'} ? 'bg-success' : 
+                                                                  ${commande.etat.name() == 'PREPARATION'} ? 'bg-warning' : 
+                                                                  ${commande.etat.name() == 'PRETE'} ? 'bg-info' : 'bg-secondary'"
+                                                  th:text="${commande.etat.libelle}">
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="card-text">
+                                            <strong>Client:</strong> <span th:text="${commande.nomClient}"></span><br>
+                                            <strong>Date:</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span><br>
+                                            <strong>Montant:</strong> <span th:text="${#numbers.formatDecimal(commande.montant, 1, 2)}"></span> €
+                                        </p>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <a th:href="@{/caisse/commande/{id}(id=${commande.id})}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Détails
+                                            </a>
+                                            
+                                            <form th:if="${commande.etat.name() == 'PAYER'}" 
+                                                  th:action="@{/caisse/{id}/changer-etat(id=${commande.id})}" 
+                                                  method="post" class="d-inline">
+                                                <input type="hidden" name="nouvelEtat" value="LIVRER">
+                                                <button type="submit" class="btn btn-success btn-sm btn-etat">
+                                                    <i class="fas fa-check"></i> Marquer Livrée
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="scripts">
+        <script>
+            // Auto-refresh toutes les 10 secondes pour les mises à jour en temps réel
+            setTimeout(function() {
+                location.reload();
+            }, 10000);
+        </script>
+    </div>
+</body>
+</html>

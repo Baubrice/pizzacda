@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, ~{::scripts})}">
+<head>
+    <title>CDAPizza - Accueil</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+                    <h1 class="display-4">
+                        <i class="fas fa-pizza-slice"></i> Bienvenue chez CDAPizza
+                    </h1>
+                    <p class="lead">Système de gestion des commandes en temps réel</p>
+                    <hr class="my-4">
+                    <p>Gérez vos commandes efficacement avec notre interface dédiée à la caisse et à la cuisine.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-cash-register fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Interface Caisse</h5>
+                        <p class="card-text">
+                            Prenez les commandes des clients, enregistrez-les et suivez leur statut.
+                        </p>
+                        <a href="/caisse" class="btn btn-success btn-lg">
+                            <i class="fas fa-arrow-right"></i> Accéder à la Caisse
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-utensils fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Interface Cuisine</h5>
+                        <p class="card-text">
+                            Consultez les commandes en cours et mettez à jour leur statut de préparation.
+                        </p>
+                        <a href="/cuisine" class="btn btn-warning btn-lg">
+                            <i class="fas fa-arrow-right"></i> Accéder à la Cuisine
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle"></i> Fonctionnalités du Système
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-plus-circle text-primary"></i> Saisie de Commandes</h6>
+                                <p class="text-muted">Enregistrement rapide des commandes clients avec calcul automatique des totaux.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-sync-alt text-warning"></i> Suivi en Temps Réel</h6>
+                                <p class="text-muted">Mise à jour instantanée des statuts entre la caisse et la cuisine.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-chart-line text-success"></i> Gestion des États</h6>
+                                <p class="text-muted">Workflow complet : Payée → En préparation → Prête → Livrée.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="scripts">
+        <script>
+            // Auto-refresh de la page toutes les 30 secondes pour les mises à jour en temps réel
+            setTimeout(function() {
+                location.reload();
+            }, 30000);
+        </script>
+    </div>
+</body>
+</html>

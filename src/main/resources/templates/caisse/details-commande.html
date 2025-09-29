@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, ~{::scripts})}">
+<head>
+    <title>CDAPizza - Détails Commande</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-receipt"></i> Détails de la Commande #<span th:text="${commande.id}"></span>
+                </h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Informations de la Commande</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ID Commande:</strong> <span th:text="${commande.id}"></span></p>
+                                <p><strong>Client:</strong> <span th:text="${commande.nomClient}"></span></p>
+                                <p><strong>Date:</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>État:</strong> 
+                                    <span class="badge badge-etat" 
+                                          th:classappend="${commande.etat.name() == 'PAYER'} ? 'bg-success' : 
+                                                          ${commande.etat.name() == 'PREPARATION'} ? 'bg-warning' : 
+                                                          ${commande.etat.name() == 'PRETE'} ? 'bg-info' : 'bg-secondary'"
+                                          th:text="${commande.etat.libelle}">
+                                    </span>
+                                </p>
+                                <p><strong>Montant Total:</strong> <span th:text="${#numbers.formatDecimal(commande.montant, 1, 2)}"></span> €</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Détail des pizzas -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Détail des Pizzas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(commande.lignesCommande)}" class="text-center text-muted py-4">
+                            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                            <p>Aucune pizza dans cette commande</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(commande.lignesCommande)}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Pizza</th>
+                                        <th>Prix unitaire</th>
+                                        <th>Quantité</th>
+                                        <th>Sous-total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ligne : ${commande.lignesCommande}">
+                                        <td th:text="${ligne.pizza.nom}"></td>
+                                        <td th:text="${#numbers.formatDecimal(ligne.pizza.prix, 1, 2)} + ' €'"></td>
+                                        <td th:text="${ligne.quantite}"></td>
+                                        <td th:text="${#numbers.formatDecimal(ligne.sousTotal, 1, 2)} + ' €'"></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <th colspan="3">Total</th>
+                                        <th th:text="${#numbers.formatDecimal(commande.montant, 1, 2)} + ' €'"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/caisse" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour à la Caisse
+                            </a>
+                            
+                            <form th:if="${commande.etat.name() == 'PAYER'}" 
+                                  th:action="@{/caisse/{id}/changer-etat(id=${commande.id})}" 
+                                  method="post">
+                                <input type="hidden" name="nouvelEtat" value="LIVRER">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-check"></i> Marquer comme Livrée
+                                </button>
+                            </form>
+                            
+                            <div th:if="${commande.etat.name() != 'PAYER'}" class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Cette commande ne peut plus être modifiée depuis la caisse.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historique des états -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Historique des États</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Commande Payée</h6>
+                                    <p class="timeline-time" th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></p>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${commande.etat.name() == 'PREPARATION' || commande.etat.name() == 'PRETE' || commande.etat.name() == 'LIVRER'}" 
+                                 class="timeline-item">
+                                <div class="timeline-marker bg-warning"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">En Préparation</h6>
+                                    <p class="timeline-time">En cours...</p>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${commande.etat.name() == 'PRETE' || commande.etat.name() == 'LIVRER'}" 
+                                 class="timeline-item">
+                                <div class="timeline-marker bg-info"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Prête</h6>
+                                    <p class="timeline-time">En cours...</p>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${commande.etat.name() == 'LIVRER'}" 
+                                 class="timeline-item">
+                                <div class="timeline-marker bg-secondary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Livrée</h6>
+                                    <p class="timeline-time">Terminée</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="scripts">
+        <style>
+            .timeline {
+                position: relative;
+                padding-left: 30px;
+            }
+            .timeline-item {
+                position: relative;
+                margin-bottom: 20px;
+            }
+            .timeline-marker {
+                position: absolute;
+                left: -35px;
+                top: 5px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+            }
+            .timeline-content {
+                padding-left: 10px;
+            }
+            .timeline-title {
+                font-size: 0.9em;
+                margin-bottom: 5px;
+            }
+            .timeline-time {
+                font-size: 0.8em;
+                color: #6c757d;
+                margin: 0;
+            }
+        </style>
+    </div>
+</body>
+</html>
